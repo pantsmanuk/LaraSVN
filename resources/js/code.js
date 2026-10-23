@@ -1,8 +1,40 @@
-import Prism from 'prismjs';
-import 'prismjs/components/prism-markup-templating.js';
-import 'prismjs/components/prism-php.js';
-import 'prismjs/components/prism-diff.js';
+import Prism, { settings } from 'larasvn:prism';
 import { tokenLines } from './token-lines.js';
+import { renderPart, enhanceRows, activateColors } from './prism-rows.js';
+
+const enabled = name => settings.plugins.includes(name);
+// Rewrite Prism's generated swatches before HTML parsing; apply their validated
+// colors through DOM properties after insertion without weakening the style CSP.
+Prism.hooks.add('wrap', env => {
+    env.content = env.content.replace(/<span class="inline-color" style="background-color:([^"]+);">/g, '<span class="inline-color" data-prism-color="$1">');
+});
+for (const region of document.querySelectorAll('.code-scroll')) {
+    region.classList.add('prism-surface');
+    region.classList.toggle('prism-no-line-numbers', !enabled('line-numbers'));
+    if (!enabled('line-numbers')) {
+        for (const gutter of region.querySelectorAll('.gutter')) gutter.tabIndex = -1;
+    }
+}
+
+function showLanguage(language, toolbar) {
+    if (!enabled('show-language') || !toolbar) return;
+    const label = document.createElement('span');
+    label.className = 'source-language';
+    label.textContent = ({ php: 'PHP', javascript: 'JavaScript', css: 'CSS', markup: 'HTML/XML', plain: 'Plain text', diff: 'Diff' })[language] ?? language;
+    toolbar.prepend(label);
+}
+
+function enableCopy(button, text, status) {
+    button.hidden = !enabled('copy-to-clipboard');
+    button.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(text);
+            status.textContent = 'Source copied.';
+        } catch {
+            status.textContent = 'Clipboard unavailable. Select the source text to copy it.';
+        }
+    });
+}
 
 const payload = document.querySelector('#source-documents');
 if (payload) {
@@ -15,27 +47,23 @@ if (payload) {
             if (!line) throw new Error('Source line mismatch');
             const fragment = document.createDocumentFragment();
             for (const part of line) {
-                const node = document.createElement('span');
-                if (part.classes.length) node.className = 'token ' + part.classes.join(' ');
-                node.textContent = part.text;
-                fragment.append(node);
+                fragment.append(renderPart(Prism, part, language));
+            }
+            if (enabled('show-invisibles') && (Number(code.dataset.line) < tokens[code.dataset.document].length || documents[code.dataset.document].endsWith('\n'))) {
+                const ending = document.createElement('span');
+                ending.className = 'token lf';
+                ending.setAttribute('aria-hidden', 'true');
+                fragment.append(ending);
             }
             code.replaceChildren(fragment);
         }
+        enhanceRows(Prism, language, settings.plugins);
+        showLanguage(language, document.querySelector('.code-toolbar'));
     } catch {
         document.querySelector('#highlight-status').textContent = 'Syntax highlighting is unavailable. Source remains readable.';
     }
     for (const button of document.querySelectorAll('[data-copy]')) {
-        button.hidden = false;
-        button.addEventListener('click', async () => {
-            const status = document.querySelector('#copy-status');
-            try {
-                await navigator.clipboard.writeText(documents[button.dataset.copy]);
-                status.textContent = 'Source copied.';
-            } catch {
-                status.textContent = 'Clipboard unavailable. Select the source text to copy it.';
-            }
-        });
+        enableCopy(button, documents[button.dataset.copy], document.querySelector('#copy-status'));
     }
 }
 
@@ -58,9 +86,25 @@ if (['#filename-search', '#history-search'].includes(window.location.hash)) {
 // Native SVN patches include directory and property changes as well as file text.
 const patch = document.querySelector('[data-patch]');
 if (patch) {
+    const text = patch.textContent;
     try {
-        patch.innerHTML = Prism.highlight(patch.textContent, Prism.languages.diff, 'diff');
+        patch.classList.add('language-diff', 'no-whitespace-normalization');
+        patch.parentElement.classList.toggle('match-braces', enabled('match-braces'));
+        patch.classList.toggle('diff-highlight', enabled('diff-highlight'));
+        Prism.highlightElement(patch);
+        activateColors(patch);
     } catch {
         document.querySelector('#highlight-status').textContent = 'Syntax highlighting is unavailable. Patch remains readable.';
+    }
+    const toolbar = patch.closest('.code-scroll').previousElementSibling;
+    showLanguage('diff', toolbar);
+    if (enabled('copy-to-clipboard') && toolbar) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = 'Copy patch';
+        const status = document.createElement('span');
+        status.setAttribute('role', 'status');
+        toolbar.append(button, status);
+        enableCopy(button, text, status);
     }
 }

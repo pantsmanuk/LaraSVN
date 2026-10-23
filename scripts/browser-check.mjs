@@ -2,6 +2,7 @@ import { chromium } from 'playwright';
 import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
+import { readPrismConfig } from './prism-config.mjs';
 
 const origin = (process.env.LARASVN_BASE_URL || 'http://larasvn.test').replace(/\/$/, '');
 const fixtureUrl = path => {
@@ -130,6 +131,62 @@ try {
         assert.deepEqual(unlabelled, [], 'Every visible input needs a label: ' + path);
     }
     assert.deepEqual(errors, []);
+    // Exercise plugin behavior with exact whitespace and hostile source text.
+    // The synthetic page still loads the real built assets under the application's CSP.
+    const settings = readPrismConfig();
+    const enabled = name => settings.plugins.includes(name);
+    const css = '/* <img src=x onerror="window.sourceExecuted=true"> */\n.box {\n\tcolor: #ff0000;  \n\ttransform: rotate(45deg);\n\ttransition: color 1s ease;\n}\n';
+    const escape = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    await context.route(origin + '/__prism-test', route => route.fulfill({
+        contentType: 'text/html',
+        headers: { 'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'" },
+        body: `<!doctype html><html data-appearance="light"><head><link rel="stylesheet" href="${origin}/build/app.css"><script type="module" src="${origin}/build/code.js"></script></head><body>
+            <div class="code-toolbar"><button data-copy="new" hidden>Copy source</button><span id="copy-status"></span></div>
+            <div class="code-scroll prism-surface"><div data-language="css">${css.slice(0, -1).split('\n').map((line, i) => `<div class="source-row"><a class="gutter">${i + 1}</a><code data-document="new" data-line="${i + 1}">${escape(line)}</code></div>`).join('')}</div></div>
+            <p id="highlight-status"></p><script type="application/json" id="source-documents">${JSON.stringify({ new: css }).replaceAll('<', '\\u003c')}</script></body></html>`,
+    }));
+    const cspErrors = [];
+    page.on('console', message => {
+        if (message.type() === 'error' && /Content Security Policy|Refused to/.test(message.text())) cspErrors.push(message.text());
+    });
+    await page.goto(origin + '/__prism-test');
+    await page.waitForSelector('code .token');
+    assert.equal(await page.locator('#highlight-status').textContent(), '');
+    assert.equal(await page.evaluate(() => window.sourceExecuted), undefined);
+    assert.equal(await page.locator('code').evaluateAll(rows => rows.map(row => row.textContent).join('\n') + '\n'), css);
+    assert.equal(await page.locator('[data-copy]').isVisible(), enabled('copy-to-clipboard'));
+    assert.equal(await page.locator('.source-language').count(), enabled('show-language') ? 1 : 0);
+    assert.equal(await page.locator('.code-scroll').evaluate(region => region.classList.contains('prism-no-line-numbers')), !enabled('line-numbers'));
+    if (enabled('show-invisibles')) {
+        assert(await page.locator('.token.space').count() > 0);
+        assert(await page.locator('.token.tab').count() > 0);
+        assert.equal(await page.locator('.token.lf').count(), css.split('\n').length - 1);
+    }
+    if (enabled('inline-color')) {
+        const swatch = await page.locator('.inline-color').first().evaluate(element => ({ html: element.outerHTML, color: getComputedStyle(element).backgroundColor }));
+        assert.equal(swatch.color, 'rgb(255, 0, 0)', JSON.stringify({ swatch, cspErrors }));
+    }
+    if (enabled('match-braces')) {
+        const brace = page.locator('.brace-open[id]').first();
+        await brace.hover();
+        assert.equal(await page.locator('.brace-hover').count(), 2);
+        await brace.focus();
+        assert.equal(await page.locator('.brace-hover').count(), 2);
+    }
+    if (enabled('previewers')) {
+        await page.locator('.token.color').first().focus();
+        await page.waitForSelector('.prism-previewer-color.active');
+    }
+    assert.deepEqual(cspErrors, []);
+    const lightSurface = await page.locator('.prism-surface').evaluate(surface => getComputedStyle(surface).backgroundColor);
+    await page.evaluate(() => { document.documentElement.dataset.appearance = 'dark'; });
+    const darkSurface = await page.locator('.prism-surface').evaluate(surface => getComputedStyle(surface).backgroundColor);
+    assert.notEqual(lightSurface, 'rgba(0, 0, 0, 0)');
+    assert.notEqual(darkSurface, 'rgba(0, 0, 0, 0)');
+    if (settings.theme === 'prism.min.css') assert.equal(lightSurface, 'rgb(245, 242, 240)');
+    if (settings.darkTheme === 'prism-tomorrow.min.css') assert.equal(darkSurface, 'rgb(45, 45, 45)');
+    await page.screenshot({ path: '/tmp/larasvn-prism-plugins.png', fullPage: true });
+    console.log('Prism configuration checks passed: exact source text, escaped markup, CSP, theme surfaces, and enabled plugin behavior. Plugins: ' + (settings.plugins.join(', ') || 'none'));
     console.log('Browser checks passed: source, multiline diff, blame, themes, persistence, system changes, cross-tab updates, mobile width, missing revision, no-JS reading, directory navigation, history pagination, filename search, deletion links, arbitrary comparison, reversal, aliases, downloads, RSS, skip-link focus, landmarks, and control labels.');
 } finally {
     await browser?.close();

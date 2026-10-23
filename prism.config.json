@@ -1,0 +1,15 @@
+{
+  "theme": "prism.min.css",
+  "darkTheme": "prism-tomorrow.min.css",
+  "plugins": [
+    "line-numbers",
+    "match-braces",
+    "show-language",
+    "copy-to-clipboard",
+    "inline-color",
+    "diff-highlight",
+    "normalize-whitespace",
+    "show-invisibles",
+    "previewers"
+  ]
+}

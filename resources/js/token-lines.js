@@ -16,8 +16,18 @@ export function tokenLines(prism, text, language) {
             walk(token.content, [...classes, token.type, ...[token.alias ?? []].flat()]);
         }
     };
-    const grammar = prism.languages[language];
-    walk(grammar ? prism.tokenize(text, grammar) : text);
+    const env = { code: text, grammar: prism.languages[language], language };
+    // Run grammar plugins once for the entire document, before distributing rows.
+    if (prism.plugins.NormalizeWhitespace) {
+        env.code = prism.plugins.NormalizeWhitespace.normalize(text, {
+            'remove-trailing': false, 'remove-indent': false, 'left-trim': false, 'right-trim': false,
+        });
+    }
+    prism.hooks.run('before-highlight', env);
+    prism.hooks.run('before-tokenize', env);
+    env.tokens = env.grammar ? prism.tokenize(env.code, env.grammar) : [env.code];
+    prism.hooks.run('after-tokenize', env);
+    walk(env.tokens);
     if (text.endsWith('\n')) lines.pop();
     return lines;
 }

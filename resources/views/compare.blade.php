@@ -26,7 +26,7 @@
     <p class="notice" role="status">No differences with these comparison settings.</p>
 @else
     <div class="section-toolbar"><span>{{ $sides[0]['path'] }} at r{{ $sides[0]['revision'] }} → {{ $sides[1]['path'] }} at r{{ $sides[1]['revision'] }}</span></div>
-    <div class="code-scroll" tabindex="0" role="region" aria-label="Unified comparison patch"><pre class="patch"><code data-patch>{{ $patch }}</code></pre></div>
+    <div class="code-scroll prism-surface" tabindex="0" role="region" aria-label="Unified comparison patch"><pre class="patch"><code data-patch>{{ $patch }}</code></pre></div>
     <p class="enhancement-status" role="status" id="highlight-status"></p>
 @endif
 @endsection

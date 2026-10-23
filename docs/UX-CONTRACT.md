@@ -9,6 +9,7 @@ implementation ownership for local browsing, history, source, diff, and blame.
 | File navigation | Named Laravel routes and shared Blade tabs | Real links preserve repository, path, revision, and peg | Real-SVN feature tests |
 | Revision selection | Shared `partials/context.blade.php` GET form | Explicit Go submits; invalid values produce a readable HTTP 400 page | Feature tests |
 | Appearance select | Native labelled select and `theme.js` | Platform popup is accepted; three explicit preferences share one owner | JS state checks; local browser checks passed |
+| Prism themes/plugins | `prism.config.json`, build integration, `token-lines.js`, and `prism-rows.js` | Local assets; paired palettes; row/clipboard text preserved; source normalization never trims content | Config validation and local browser plugin checks |
 | Code rows | Blade source and comparison views | Server-readable text; source gutters excluded from selection; enhancement preserves line text | PHP and token tests; browser selection review pending |
 | Scrollbars | `resources/css/app.css` | Global semantic colours; document vertical flow; internal code horizontal overflow | Browser review pending |
 | Directory/search lists | Shared entries table and pagination | Semantic tables, directory-first ordering, 50 entries per page | Real-SVN feature tests |

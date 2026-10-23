@@ -6,6 +6,7 @@ rollback, see [deployment instructions](../DEPLOYMENT.md).
 - [Architecture and compatibility scope](ARCHITECTURE.md)
 - [Design guidance](DESIGN.md)
 - [Shared UX contracts](UX-CONTRACT.md)
+- [Prism themes and plugins](PRISM.md)
 - [User acceptance checklist](UAT.md)
 - [Production configuration audit](PRODUCTION-AUDIT.md)
 

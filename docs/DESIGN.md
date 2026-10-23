@@ -238,9 +238,12 @@ layout must not hide actions or require desktop hover.
 
 ## Source, diff, and blame
 
-Prism syntax colours belong to the same theme as the surrounding application.
-There is no independent code-theme selector in the first release. Switching
-appearance updates source, diff, blame, and any open overlay together.
+Site-level Prism theme and plugin choices live in `prism.config.json`. The build
+bundles paired light/dark palettes from the installed Prism package. There is no
+separate visitor-facing code-theme selector. Switching Appearance updates source,
+diff, and blame together. The default palettes are standard Prism and Tomorrow;
+the standard palette's lighter tokens receive contrast corrections. See
+[PRISM.md](PRISM.md) for configuration and row-preserving plugin behaviour.
 
 Syntax highlighting, changed-line backgrounds, word-change marks, selection,
 and focus must coexist. A syntax token that is readable on an ordinary source
@@ -324,8 +327,9 @@ The provisional local shell uses a narrow repository rail and a shared content
 header. It is available for review, not a final choice between the two shell
 directions above. `resources/css/app.css` owns exact runtime values. Semantic
 roles map directly to `--page`, `--chrome`, `--text`, `--muted`, `--border`,
-`--accent`, `--active`, `--focus`, `--added`, and `--deleted`. Syntax uses
-`--comment`, `--keyword`, `--string`, `--number`, and `--punctuation`. Scrollbars
+`--accent`, `--active`, `--focus`, `--added`, and `--deleted`. Syntax palettes now
+come from `prism.config.json` through `scripts/prism-config.mjs`; the theme layer
+owns token colours while `resources/css/app.css` owns reading geometry. Scrollbars
 use `--scrollbar`. Each role has one `light-dark()` pair; components do not copy
 separate theme palettes. This establishes a modern-browser baseline.
 
