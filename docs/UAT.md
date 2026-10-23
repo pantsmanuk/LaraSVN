@@ -1,7 +1,8 @@
 # UAT checklist
 
 The code is a local UAT candidate. Production parity is conditional on the actual
-installation settings, and browser checks have not passed in the agent sandbox.
+installation settings. Local automated browser checks passed on 23 October 2026;
+manual acceptance and staging checks remain open.
 Mark results here or return notes with the URL, selected revision, appearance,
 expected result, and observed result. Cosmetic feedback is welcome at this stage.
 
@@ -18,12 +19,9 @@ repository is needed in the current workspace. Only local/testing environments w
 fall back to the fixture; a broken explicit repository configuration fails closed.
 Run `php artisan svn:check --repository=fixture` before starting review.
 
-Automated browser checks can use either transport:
+Run automated browser checks against a running local server:
 
 ```bash
-# Actual Laravel HTTP kernel, transported without opening an HTTP server.
-npm run test:browser
-
 # Existing local server, or a locally staged Apache mount with the fixture.
 LARASVN_BASE_URL=http://127.0.0.1:8000 npm run test:browser
 LARASVN_BASE_URL=http://localhost/websvn npm run test:browser
@@ -35,6 +33,30 @@ requires its known data. Do not point it at the production WebSVN service.
 Automated checks include syntax tokens, theme state, mobile overflow, aliases,
 ZIP downloads, RSS, keyboard skip-link focus, landmarks, labelled controls, and
 reading with JavaScript disabled. They do not replace visual/accessibility review.
+
+## Automated browser verification
+
+Passed on 23 October 2026 against application revision `b117eb0`, using Playwright
+Chromium and a temporary server started with
+`php artisan serve --host=127.0.0.1 --port=8000 --no-reload`:
+
+```bash
+LARASVN_BASE_URL=http://127.0.0.1:8000 node scripts/browser-check.mjs
+```
+
+The command exited 0. Coverage included source highlighting, multiline diff,
+blame, appearance persistence, system changes, cross-tab updates, narrow-screen
+overflow, missing revisions, no-JavaScript reading, directory navigation, history
+pagination, filename search clearing, deletion links, comparison and reversal,
+aliases, ZIP downloads, RSS, skip-link focus, landmarks, and control labels.
+Review screenshots were saved as `/tmp/larasvn-*.png`. The server was stopped
+after verification.
+
+Chromium requires execution outside the agent sandbox. The default transport
+without `LARASVN_BASE_URL` failed hostname resolution after an alias redirect;
+the successful run used the local HTTP server. This result does not establish
+Apache/PHP-FPM mount behaviour, full WCAG conformance, or manual visual acceptance.
+The local acceptance rows below remain for user review.
 
 ## Local acceptance
 
@@ -77,7 +99,7 @@ passed merely because fixture tests pass.
 | Whole-root public access | No WebSVN access file or authentication in supplied snippet | Check inherited Apache/runtime overlays on host |
 | MIME and download parity | text/plain override; downloads disabled, depth 2 inactive | Profile prepared; actual file types/encoding need UAT |
 | `/websvn` Apache routing and assets | Adapted configuration, syntax check, live staging URL tests | Awaiting host check |
-| Browser and visual acceptance | Successful harness output and local checklist | Awaiting browser check |
+| Browser and visual acceptance | Successful harness output and local checklist | Local harness passed 23 October 2026; manual visual/accessibility UAT pending |
 | Resource policy | Approved limits, FPM worker/memory budget, temporary cleanup | Candidate defaults documented |
 | Rollback | Previous WebSVN release/mount preserved and restore path checked | Awaiting deployment review |
 

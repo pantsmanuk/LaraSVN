@@ -1,5 +1,9 @@
 # Phase 2 handoff
 
+Historical snapshot dated 19 October 2026. The browser blockers below were
+superseded by the successful local Playwright run on 23 October 2026. See
+[UAT.md](UAT.md) for current evidence and remaining manual and staging checks.
+
 Updated 19 October 2026. Functional implementation is ready for local workflow
 review. Browser verification and UAT acceptance remain outstanding. This handoff
 supersedes the current-state notes in [PHASE1.md](PHASE1.md).

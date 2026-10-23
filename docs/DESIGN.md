@@ -1,11 +1,13 @@
 # LaraSVN: UI and UX guidance
 
 Status: design brief dated 2 October 2026. Initial local proof added 19 October
-2026; visual acceptance remains pending.
+2026. Local automated browser checks passed 23 October 2026; manual visual and
+accessibility acceptance remains pending.
 
 This document records the intended interface and appearance behaviour for the
 Laravel replacement described in [ARCHITECTURE.md](ARCHITECTURE.md). It specifies
-requirements and design direction. The initial local UI is not visually verified.
+requirements and design direction. Automated checks do not replace manual visual
+acceptance; see [UAT.md](UAT.md) for the current evidence and checklist.
 
 ## Design intent
 
@@ -33,7 +35,8 @@ The user wants a UAT-ready product before reviewing detailed UI notes. Developme
 phases prioritize complete workflows and compatibility while preserving this
 design contract. Detailed cosmetic feedback belongs to UAT; each phase does not
 require separate visual approval. Correctness, accessibility, and security defects
-are addressed as they arise. Browser verification remains required before UAT.
+are addressed as they arise. The automated browser verification required before
+UAT passed on 23 October 2026.
 
 ## Reference and decisions still open
 
@@ -308,8 +311,9 @@ Before implementation is considered complete, verify these cases in a browser:
   spacing, subdued surfaces, and action placement, without reproducing its layout
   or adding its product features.
 
-These acceptance checks remain binding. Phase 1 has automated kernel and JavaScript
-evidence, but browser verification remains outstanding; see [PHASE1.md](PHASE1.md).
+These acceptance checks remain binding. Local automated browser checks passed on
+23 October 2026; [UAT.md](UAT.md) distinguishes covered behaviour from the remaining
+manual review. [PHASE1.md](PHASE1.md) retains the historical verification limits.
 The ProjectSend source review informs the brief, but does not count as browser
 verification of either application.
 
@@ -343,7 +347,8 @@ Shared snapshot navigation owns comparison, feeds, raw-file links, and download
 formats. Downloads appear only when enabled for the repository. Feeds and raw
 files use their appropriate document responses rather than a second application
 shell. This phase adds no branding, dashboard widgets, or visual redesign.
-Browser verification of these additions remains outstanding.
+Local browser checks for comparison, reversal, feeds, aliases, ZIP downloads, and
+no-JavaScript patches passed on 23 October 2026. Full manual acceptance remains open.
 
 
 ## Phase 4 acceptance
@@ -353,6 +358,6 @@ and resource-policy work adds no new visual direction. Error pages use generic
 repository navigation rather than fixture-specific wording. When publication is
 disabled, the shell also hides configured repository names. The browser harness
 now checks skip-link focus, labelled native controls, and landmarks across the
-existing screens; these checks still need a successful host browser run. The
-manual matrix in UAT.md covers keyboard use, 200% zoom, appearance, readable
+existing screens; these checks passed locally on 23 October 2026. The
+manual matrix in [UAT.md](UAT.md) covers keyboard use, 200% zoom, appearance, readable
 syntax colours, and no-JavaScript behaviour.

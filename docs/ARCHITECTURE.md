@@ -4,7 +4,8 @@ Status: product plan dated 2 October 2026. Phase 1 local implementation started
 19 October 2026. Phase 3 adds comparison, feeds, downloads/raw responses, and
 browse aliases. Phase 4 adds deployment configuration, resource controls, local
 development tooling, and acceptance guidance. See [PHASE4.md](PHASE4.md) for
-current delivered scope and outstanding host/browser verification. The supplied
+current delivered scope. Local browser checks passed on 23 October 2026; remaining
+manual acceptance and host checks are recorded in [UAT.md](UAT.md). The supplied
 production settings are audited in [PRODUCTION-AUDIT.md](PRODUCTION-AUDIT.md).
 
 ## Product goal
@@ -289,7 +290,8 @@ content, timeouts, and highlighting failures each receive a useful state.
 During implementation, extend `DESIGN.md` with accepted tokens and their runtime
 mapping. A short `UX-CONTRACT.md` can record shared navigation, URL state,
 scrolling, localization, and interaction behaviour. The initial local proof and
-its remaining browser checks are recorded in [PHASE1.md](PHASE1.md).
+its original verification limits are recorded in [PHASE1.md](PHASE1.md). Current
+browser results and remaining manual checks are recorded in [UAT.md](UAT.md).
 
 ## Operational boundaries
 

@@ -2,8 +2,8 @@
 
 This is a deployment candidate, not permission to replace the production service.
 Supplied production WebSVN/Apache settings have been audited in
-[PRODUCTION-AUDIT.md](docs/PRODUCTION-AUDIT.md). Host configuration and browser results
-still need review. The only
+[PRODUCTION-AUDIT.md](docs/PRODUCTION-AUDIT.md). Local automated browser checks pass;
+host configuration, staging browser checks, and manual UAT still need review. The only
 production repository authorised for agent inspection is `svn-hooks`.
 
 ## Supported access model

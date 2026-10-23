@@ -85,7 +85,8 @@ Browser checks require a Playwright Chromium installation:
 
 ```bash
 npx playwright install chromium
-npm run test:browser
+# In another terminal, start php artisan dev, then run:
+LARASVN_BASE_URL=http://127.0.0.1:8000 npm run test:browser
 ```
 
 For an existing local server or staged Apache mount, set
@@ -98,8 +99,11 @@ Playwright routing rather than opening a TCP port. It checks DOM enhancement,
 appearance behaviour, browsing, history pagination, search clearing, deletion
 links, arbitrary comparisons, archive downloads, feeds, aliases, narrow-screen
 overflow, error rendering, and no-JavaScript reading. It writes review screenshots to `/tmp/larasvn-*.png`.
-Browser checks have not passed in the restricted development session: Chromium
-cannot start because a required socket operation is prohibited.
+On 23 October 2026, all automated browser checks passed against a local PHP server
+using Playwright Chromium outside the agent sandbox. The default intercepted
+transport hit a hostname-resolution failure after an alias redirect; use the
+local-server command above for the verified path. See [UAT.md](docs/UAT.md) for
+the command, coverage, and remaining manual and deployment checks.
 
 ## Scope and next work
 
@@ -148,7 +152,7 @@ Supplied production configuration has been audited in
 checks, deployed Apache checks, full
 language/encoding support, remaining legacy parameter and fragment aliases,
 word-level change marks, legacy export transformations, extension-triggered gzip,
-and final deployment/browser/UAT checks.
+and final deployment and manual UAT checks.
 See [PHASE4.md](docs/PHASE4.md) for current status, [UAT.md](docs/UAT.md) for acceptance,
 [DEPLOYMENT.md](DEPLOYMENT.md) for staging/rollback, and [PHASE3.md](docs/PHASE3.md) for
 endpoint compatibility details, [PHASE2.md](docs/PHASE2.md) for

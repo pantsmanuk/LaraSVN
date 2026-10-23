@@ -68,8 +68,9 @@ never document roots.
 - Review UTF-8 assumptions and real SVN MIME properties using svn-hooks only.
   Broader character encodings, the complete legacy extension map, and additional
   WebSVN configuration modes remain outside the documented subset.
-- Complete browser/accessibility and visual UAT on the user's host. Sandbox browser
-  restrictions persist; PHP tests do not establish a browser pass.
+- Complete manual accessibility/visual UAT and staged Apache browser checks on the
+  user's host. Local Playwright checks passed on 23 October 2026 outside the agent
+  sandbox; see [UAT.md](UAT.md). That pass does not verify the production host.
 
 The static configuration audit is complete. Deployment activation and host/UAT
 acceptance remain open. See [UAT.md](UAT.md) and [DEPLOYMENT.md](../DEPLOYMENT.md).

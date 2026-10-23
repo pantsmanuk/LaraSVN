@@ -1,7 +1,8 @@
 # Phase 4 handoff
 
-Updated 19 October 2026. Local deployment/UAT preparation is implemented. The supplied
-production configuration audit is complete; host checks and browser acceptance
+Updated 19 October 2026; browser results supplemented 23 October 2026. Local
+deployment/UAT preparation and automated browser checks are complete. The supplied
+production configuration audit is complete; host checks and manual acceptance
 remain open, so this
 is a review candidate rather than a completed production sign-off. See
 [UAT.md](UAT.md) for the checklist and [DEPLOYMENT.md](../DEPLOYMENT.md) for staging
@@ -73,10 +74,12 @@ without rebuilding config cache. These checks used private temporary caches and 
 configuration; the workspace's live environment/cache and production were not
 changed.
 
-Chromium was attempted again and still fails to launch because the sandbox denies
-`setsockopt`. Browser, visual/accessibility, and actual Apache/PHP-FPM verification
-are not claimed. Automated PHP mount tests are not a substitute for the deployed
-server check.
+On 23 October 2026, the full Playwright Chromium harness passed against a temporary
+local PHP server outside the agent sandbox. The server was stopped after the run.
+The default intercepted transport hit a hostname-resolution error after an alias
+redirect, so the verified path sets `LARASVN_BASE_URL=http://127.0.0.1:8000`.
+See [UAT.md](UAT.md) for the exact command and coverage. Manual visual/accessibility
+acceptance and actual Apache/PHP-FPM verification remain open.
 
 ## Production evidence
 
@@ -102,7 +105,7 @@ Production has not been activated or configured in the local .env.
 1. Run `php artisan dev`. Confirm assets rebuild after a frontend edit and Ctrl+C
    stops both server and watcher. The existing Phase 3 fixture remains ready.
 2. Follow [UAT.md](UAT.md), including detailed cosmetic feedback at this stage.
-   Run the browser harness on a host that permits Chromium.
+   The local automated browser run has passed; record manual acceptance separately.
 3. Review [DEPLOYMENT.md](../DEPLOYMENT.md) and the example server configuration.
    Do not activate a production replacement yet.
 4. Confirm inherited access/runtime rules and real filesystem permissions on the
