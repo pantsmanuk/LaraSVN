@@ -1,14 +1,13 @@
 # LaraSVN
 
-A Laravel 13 and PrismJS Subversion browser, heavily inspired by WebSVN.
-The local implementation supports
-repository/directory browsing, properties, history, revision details, filename
-search, source, previous-change and arbitrary comparisons, blame, RSS, downloads,
-raw MIME responses, and legacy browse aliases. All seven staging/production
-acceptance gates passed in the user's review on 23 October 2026. LaraSVN is
-running alongside WebSVN and is not yet publicly available. See
-[UAT.md](docs/UAT.md) for the results and [compatibility scope](docs/PHASE3.md)
-for the supported WebSVN subset.
+A read-only Subversion browser built with Laravel 13 and PrismJS, inspired by WebSVN.
+
+Browse repositories, directories, source, properties, and history. Inspect revisions,
+compare files and directories, view line attribution, and search filenames or commit
+history. RSS feeds, downloads, raw file responses, and legacy WebSVN URLs are also
+supported. Source and line attribution remain readable with JavaScript disabled.
+
+LaraSVN supports a [documented subset of WebSVN behaviour](docs/COMPATIBILITY.md).
 
 ## Local startup
 
@@ -28,85 +27,24 @@ npm run build
 php artisan dev
 ```
 
-On the current workspace, dependencies, `.env`, fixture, and built assets already
-exist. Start with `php artisan dev` and open <http://127.0.0.1:8000>.
+Open <http://127.0.0.1:8000> to browse the sample repository.
 The dev command starts Laravel and watches CSS/JavaScript for rebuilds. Reload
 the browser after changes; Ctrl+C stops both processes. `composer run dev` is an
 alias. Use `--port=8001` if needed. For a server without watching, use
 `php artisan serve` and build assets with `npm run build`. Development serving is
 restricted to `APP_ENV=local`; deployment uses PHP-FPM.
 
-The Phase 3 fixture has 27 revisions in `storage/app/fixture-v3`. Earlier
-fixtures remain in `storage/app/fixture` and `storage/app/fixture-v2`.
-`example.php` changes at r10 and r20, with unrelated commits between them. It contains a long multiline PHP comment and a heredoc.
-Other sample files cover empty content, Unicode, an `@` in a filename, tabs, CRLF,
-and no final newline. Revisions 21–26 add nested directories, properties, a copy,
-a rename, a deletion, and a property-only change. The fixture command refuses to
-overwrite an existing fixture. Revision 27 adds binary/active content, hooks,
-whitespace samples, an external reference, and an isolated symlink. Root downloads
-are rejected because they contain that symlink; download `/docs` or `/formats`.
-To rebuild this disposable fixture, remove only `storage/app/fixture-v3` and run
-the command again.
+See [testing and fixtures](docs/TESTING.md) for sample content and review URLs.
 
-## Review URLs
+## Deployment
 
-- `/listing.php?repname=fixture&path=%2F`
-- `/listing.php?repname=fixture&path=%2Ftrunk%2Fsrc&rev=22`
-- `/log.php?repname=fixture&path=%2F&showchanges=1`
-- `/log.php?repname=fixture&path=%2F&search=cafe`
-- `/revision.php?repname=fixture&rev=25`
-- `/search.php?repname=fixture&path=%2F&search=*.php`
-- `/filedetails.php?repname=fixture&path=/example.php`
-- `/diff.php?repname=fixture&path=/example.php&rev=20`
-- `/diff.php?repname=fixture&path=/example.php&rev=20&all=1`
-- `/blame.php?repname=fixture&path=/example.php&rev=20`
-- `/comp.php?repname=fixture&compare[0]=/example.php@10&compare[1]=/example.php@20`
-- `/comp.php?repname=fixture&compare[0]=/docs@25&compare[1]=/docs@26`
-- `/rss.php?repname=fixture&path=/docs&max=5`
-- `/dl.php?repname=fixture&path=/docs&dlmode=zip`
-- `/dl.php?repname=fixture&path=/docs&dlmode=gzip`
-- `/filedetails.php?repname=fixture&path=/formats/binary.bin&usemime=1`
-- `/browse.php/fixture/docs`
+This release supports whole, anonymously public repository roots. **Do not publish
+repositories that require per-user or per-path access filtering.**
 
-Follow Browse → History → Revision → Source, then inspect Changes and Blame.
-Deletion links open source before deletion; historical listings open the selected
-snapshot. Check Light, Dark, and System appearance across these views. Source
-and attribution render on the server and remain readable with JavaScript disabled.
-Prism tokenizes complete documents before distributing tokens into visible lines.
-
-## Verification
-
-```bash
-composer run verify
-```
-
-This builds assets, runs PHP and JS checks, checks formatting, and verifies the
-local fixture prerequisites. Individual checks remain available through
-`php artisan test`, `npm test`, and `npm run build`.
-
-Browser checks require a Playwright Chromium installation:
-
-```bash
-npx playwright install chromium
-# In another terminal, start php artisan dev, then run:
-LARASVN_BASE_URL=http://127.0.0.1:8000 npm run test:browser
-```
-
-For an existing local server or staged Apache mount, set
-`LARASVN_BASE_URL=http://localhost/websvn`. The harness selects the known
-`fixture`; do not point it at production.
-
-Alternatively, set `CHROMIUM_EXECUTABLE` to a compatible local Chromium binary.
-The browser harness transports actual Laravel HTTP-kernel responses through
-Playwright routing rather than opening a TCP port. It checks DOM enhancement,
-appearance behaviour, browsing, history pagination, search clearing, deletion
-links, arbitrary comparisons, archive downloads, feeds, aliases, narrow-screen
-overflow, error rendering, and no-JavaScript reading. It writes review screenshots to `/tmp/larasvn-*.png`.
-On 23 October 2026, all automated browser checks passed against a local PHP server
-using Playwright Chromium outside the agent sandbox. The default intercepted
-transport hit a hostname-resolution failure after an alias redirect; use the
-local-server command above for the verified path. See [UAT.md](docs/UAT.md) for
-the command, coverage, and remaining manual and deployment checks.
+Deployment requires an explicit JSON repository file or `SVN_PARENT_PATH`, plus
+`SVN_PUBLIC_READ=true`. There is no production fixture fallback. Read the
+[deployment guide](DEPLOYMENT.md) before configuring PHP-FPM, repository access,
+or a subdirectory mount.
 
 ## Prism configuration
 
@@ -119,57 +57,23 @@ Pascal/Delphi and common source formats are mapped to their Prism grammars, whic
 are bundled automatically with their dependencies. Unknown extensions use plain
 text. See [Prism configuration](docs/PRISM.md) for supported choices and source-preservation rules.
 
-## Scope and next work
+## Verification
 
-The current local environment uses `fixture`. Staging/production requires an
-explicit JSON repository file or `SVN_PARENT_PATH`, plus `SVN_PUBLIC_READ=true`; there is no fixture
-fallback there. This release supports whole, anonymously public repository roots.
-Do not publish roots that rely on per-user or per-path access filtering. See
-[DEPLOYMENT.md](DEPLOYMENT.md) before configuring a deployment.
+```bash
+composer run verify
+```
 
-The local implementation supports UTF-8 source, numeric operative/peg revisions,
-compact/full previous-change comparisons, whitespace toggling, XML properties,
-repository groups, directory/file links, paginated history, and SVN filename glob
-search. History supports `page`, `all`, `showchanges`, `search`, `fr`, `max`, and
-numeric or `HEAD` values for `sr` and `er`. Every search word must match the message
-or author, without case or accent differences. Empty filename queries do not scan
-the repository. Directory/search pages contain up to 50 entries; history pages
-contain up to 20 changes unless `all=1`.
+This builds assets, runs PHP and JavaScript checks, checks formatting, and verifies
+local fixture prerequisites. See [testing and fixtures](docs/TESTING.md) for
+individual checks and browser testing.
 
-Default SVN display/raw limit is 2 MB, enforced during reads. Source displays
-also have a 20000-line cap, checked before splitting or rendering. Downloads
-allow 20 MB of stored file data and 1000 entries; archives have a 22 MB total archive
-limit. Downloads use isolated temporary directories and clean up before responding.
-They exclude externals, reject symlinks, and preserve executable file permissions.
-They preserve stored bytes without export keyword/EOL transformations. Raw
-responses use a restrictive CSP sandbox. See [PHASE3.md](docs/PHASE3.md) for the
-compatibility details.
+## Documentation
 
-History `max` defaults to 40 entries,
-or 0 when searching. A finite max shows a limit notice when more entries exist.
-`max=0` requests all entries within a 1000-change local cap; exceeding that cap
-returns an explicit error. Environment-backed limits, a shared 30-second SVN request budget, and a
-documented PHP-FPM concurrency/memory policy are available for deployment review.
-
-Only repository-root URLs are supported. Configured exposed subpaths are rejected
-until history filtering can preserve that boundary. Configuration entries now
-have `url`, optional `group`, `downloads` (default false), and `rss` (default true)
-keys. Use `SVN_PARENT_PATH` for per-request local directory discovery, or set
-`SVN_REPOSITORIES_FILE` to a JSON mapping using these fields; string
-entries from Phase 1 must be migrated. Configuration errors fail closed. Production
-publication requires explicit acknowledgement that all configured history is public.
-`php artisan svn:check --production --repository=svn-hooks` checks the deployment
-settings and read-only root access when run on the target host.
-
-Supplied production configuration has been audited in
-[PRODUCTION-AUDIT.md](docs/PRODUCTION-AUDIT.md). User-reported staging/production
-acceptance is recorded in [UAT.md](docs/UAT.md); public cutover has not occurred.
-Known compatibility limits include full language/encoding support, remaining
-legacy parameter and fragment aliases, word-level change marks, legacy export
-transformations, and extension-triggered gzip.
-See [PHASE4.md](docs/PHASE4.md) for current status, [UAT.md](docs/UAT.md) for acceptance,
-[DEPLOYMENT.md](DEPLOYMENT.md) for staging/rollback, and [PHASE3.md](docs/PHASE3.md) for
-endpoint compatibility details, [PHASE2.md](docs/PHASE2.md) for
-browsing/history implementation, [PHASE1.md](docs/PHASE1.md) for the
-initial proof, [ARCHITECTURE.md](docs/ARCHITECTURE.md) for the product plan, and
-[DESIGN.md](docs/DESIGN.md) for the design contract.
+- [Supported behaviour and compatibility](docs/COMPATIBILITY.md)
+- [Testing and fixtures](docs/TESTING.md)
+- [Deployment and rollback](DEPLOYMENT.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Design guidance](docs/DESIGN.md) and [UX contracts](docs/UX-CONTRACT.md)
+- [Acceptance and verification records](docs/UAT.md)
+- [Production configuration audit](docs/PRODUCTION-AUDIT.md)
+- [All supporting documentation and implementation history](docs/README.md)

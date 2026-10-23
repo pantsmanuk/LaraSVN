@@ -3,6 +3,8 @@
 For setup, see the [project README](../README.md). For staging, production, and
 rollback, see [deployment instructions](../DEPLOYMENT.md).
 
+- [Supported behaviour and compatibility](COMPATIBILITY.md)
+- [Testing and fixtures](TESTING.md)
 - [Architecture and compatibility scope](ARCHITECTURE.md)
 - [Design guidance](DESIGN.md)
 - [Shared UX contracts](UX-CONTRACT.md)

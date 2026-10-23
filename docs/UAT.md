@@ -39,31 +39,12 @@ were not itemized in the acceptance report.
 These instructions support repeatable development checks. The user's acceptance
 review was performed against staging/production, not the local fixture.
 
-Run `php artisan dev` and open <http://127.0.0.1:8000>. The command starts the server
-and rebuilds CSS/JavaScript after edits. Reload pages to see changes; this is not
-browser hot reload. Ctrl+C stops both processes. Use `--port=8001` if 8000 is busy.
-`composer run dev` starts the same command. `php artisan serve` still works with
-`npm run build` for a manual asset build.
-
-The fixture is still revision 27 in `storage/app/fixture-v3`. No rebuild or new
-repository is needed in the current workspace. Only local/testing environments without explicit JSON/parent settings
-fall back to the fixture; a broken explicit repository configuration fails closed.
-Run `php artisan svn:check --repository=fixture` before starting review.
-
-Run automated browser checks against a running local server:
-
-```bash
-# Existing local server, or a locally staged Apache mount with the fixture.
-LARASVN_BASE_URL=http://127.0.0.1:8000 npm run test:browser
-LARASVN_BASE_URL=http://localhost/websvn npm run test:browser
-```
-
-Playwright and its Chromium browser are installed in the development workspace.
-The browser script explicitly selects `fixture` and
-requires its known data. Do not point it at the production WebSVN service.
-Automated checks include syntax tokens, theme state, mobile overflow, aliases,
-ZIP downloads, RSS, keyboard skip-link focus, landmarks, labelled controls, and
-reading with JavaScript disabled. They do not replace visual/accessibility review.
+See [testing and fixtures](TESTING.md) for setup, fixture contents, automated
+checks, and manual review URLs. Only local/testing environments without explicit
+JSON/parent settings fall back to the fixture. A broken explicit repository
+configuration fails closed. Run `php artisan svn:check --repository=fixture`
+before starting review. Browser checks require the known fixture data and must
+not target production. They do not replace visual/accessibility review.
 
 ## Automated browser verification
 
