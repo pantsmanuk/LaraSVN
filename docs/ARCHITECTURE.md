@@ -4,8 +4,9 @@ Status: product plan dated 2 October 2026. Phase 1 local implementation started
 19 October 2026. Phase 3 adds comparison, feeds, downloads/raw responses, and
 browse aliases. Phase 4 adds deployment configuration, resource controls, local
 development tooling, and acceptance guidance. See [PHASE4.md](PHASE4.md) for
-current delivered scope. Local browser checks passed on 23 October 2026; remaining
-manual acceptance and host checks are recorded in [UAT.md](UAT.md). The supplied
+current delivered scope. Local browser checks and all seven user-reviewed
+staging/production acceptance gates passed on 23 October 2026; see [UAT.md](UAT.md).
+Public cutover has not occurred. The supplied
 production settings are audited in [PRODUCTION-AUDIT.md](PRODUCTION-AUDIT.md).
 
 ## Product goal

@@ -1,5 +1,10 @@
 # Phase 4 handoff
 
+Acceptance update, 23 October 2026: the user reported all seven staging/production
+gates passed, including explicit browser and visual acceptance. LaraSVN remains
+non-public alongside the working original WebSVN. See [UAT.md](UAT.md) for the
+current record. The preparation notes below describe the earlier review state.
+
 Updated 19 October 2026; browser results supplemented 23 October 2026. Local
 deployment/UAT preparation and automated browser checks are complete. The supplied
 production configuration audit is complete; host checks and manual acceptance

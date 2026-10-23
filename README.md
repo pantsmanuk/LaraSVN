@@ -4,8 +4,11 @@ A Laravel 13 and PrismJS Subversion browser, heavily inspired by WebSVN.
 The local implementation supports
 repository/directory browsing, properties, history, revision details, filename
 search, source, previous-change and arbitrary comparisons, blame, RSS, downloads,
-raw MIME responses, and legacy browse aliases. Production configuration
-and full WebSVN compatibility are not ready.
+raw MIME responses, and legacy browse aliases. All seven staging/production
+acceptance gates passed in the user's review on 23 October 2026. LaraSVN is
+running alongside WebSVN and is not yet publicly available. See
+[UAT.md](docs/UAT.md) for the results and [compatibility scope](docs/PHASE3.md)
+for the supported WebSVN subset.
 
 ## Local startup
 
@@ -148,11 +151,11 @@ publication requires explicit acknowledgement that all configured history is pub
 settings and read-only root access when run on the target host.
 
 Supplied production configuration has been audited in
-[PRODUCTION-AUDIT.md](docs/PRODUCTION-AUDIT.md). Outstanding: inherited access/runtime
-checks, deployed Apache checks, full
-language/encoding support, remaining legacy parameter and fragment aliases,
-word-level change marks, legacy export transformations, extension-triggered gzip,
-and final deployment and manual UAT checks.
+[PRODUCTION-AUDIT.md](docs/PRODUCTION-AUDIT.md). User-reported staging/production
+acceptance is recorded in [UAT.md](docs/UAT.md); public cutover has not occurred.
+Known compatibility limits include full language/encoding support, remaining
+legacy parameter and fragment aliases, word-level change marks, legacy export
+transformations, and extension-triggered gzip.
 See [PHASE4.md](docs/PHASE4.md) for current status, [UAT.md](docs/UAT.md) for acceptance,
 [DEPLOYMENT.md](DEPLOYMENT.md) for staging/rollback, and [PHASE3.md](docs/PHASE3.md) for
 endpoint compatibility details, [PHASE2.md](docs/PHASE2.md) for

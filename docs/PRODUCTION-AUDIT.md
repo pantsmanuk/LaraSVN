@@ -1,5 +1,11 @@
 # Production configuration audit
 
+Historical configuration audit. On 23 October 2026 the user reported all seven
+staging/production acceptance gates passed; see [UAT.md](UAT.md). Those results
+describe the reviewed installation, including working downloads. The settings
+and open checks below describe the originally supplied configuration. LaraSVN
+is still non-public, with original WebSVN operating in parallel.
+
 19 October 2026. This audit reads the supplied Apache snippet and WebSVN include
 files as text. Reference PHP was not included or executed. No production
 repository was opened. Local proof uses disposable fixtures only.

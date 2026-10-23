@@ -1,8 +1,9 @@
 # LaraSVN: UI and UX guidance
 
 Status: design brief dated 2 October 2026. Initial local proof added 19 October
-2026. Local automated browser checks passed 23 October 2026; manual visual and
-accessibility acceptance remains pending.
+2026. Local automated browser checks passed 23 October 2026. The user passed and
+accepted the browser and visual gate in staging/production on the same date;
+see [UAT.md](UAT.md). Detailed accessibility cases were not individually reported.
 
 This document records the intended interface and appearance behaviour for the
 Laravel replacement described in [ARCHITECTURE.md](ARCHITECTURE.md). It specifies
@@ -312,8 +313,8 @@ Before implementation is considered complete, verify these cases in a browser:
   or adding its product features.
 
 These acceptance checks remain binding. Local automated browser checks passed on
-23 October 2026; [UAT.md](UAT.md) distinguishes covered behaviour from the remaining
-manual review. [PHASE1.md](PHASE1.md) retains the historical verification limits.
+23 October 2026; [UAT.md](UAT.md) records covered behaviour and subsequent user
+acceptance. [PHASE1.md](PHASE1.md) retains the historical verification limits.
 The ProjectSend source review informs the brief, but does not count as browser
 verification of either application.
 
@@ -348,7 +349,8 @@ formats. Downloads appear only when enabled for the repository. Feeds and raw
 files use their appropriate document responses rather than a second application
 shell. This phase adds no branding, dashboard widgets, or visual redesign.
 Local browser checks for comparison, reversal, feeds, aliases, ZIP downloads, and
-no-JavaScript patches passed on 23 October 2026. Full manual acceptance remains open.
+no-JavaScript patches passed on 23 October 2026. The user subsequently passed and
+accepted the browser and visual gate in staging/production; see [UAT.md](UAT.md).
 
 
 ## Phase 4 acceptance

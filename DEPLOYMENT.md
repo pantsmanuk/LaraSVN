@@ -1,9 +1,13 @@
 # Deployment and rollback
 
-This is a deployment candidate, not permission to replace the production service.
+All seven staging/production acceptance gates passed in the user's review on
+23 October 2026; see [UAT.md](docs/UAT.md). LaraSVN and original WebSVN remain
+operational in parallel. LaraSVN is not yet publicly available; public cutover is
+a separate deployment step.
+
 Supplied production WebSVN/Apache settings have been audited in
-[PRODUCTION-AUDIT.md](docs/PRODUCTION-AUDIT.md). Local automated browser checks pass;
-host configuration, staging browser checks, and manual UAT still need review. The only
+[PRODUCTION-AUDIT.md](docs/PRODUCTION-AUDIT.md). The staging URL is inaccessible
+from the development environment, so host acceptance is user-reported. The only
 production repository authorised for agent inspection is `svn-hooks`.
 
 ## Supported access model
