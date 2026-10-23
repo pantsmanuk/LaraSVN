@@ -1,6 +1,7 @@
 # LaraSVN
 
-A Laravel 13 and PrismJS Subversion browser. The local implementation supports
+A Laravel 13 and PrismJS Subversion browser, heavily inspired by WebSVN.
+The local implementation supports
 repository/directory browsing, properties, history, revision details, filename
 search, source, previous-change and arbitrary comparisons, blame, RSS, downloads,
 raw MIME responses, and legacy browse aliases. Production configuration
