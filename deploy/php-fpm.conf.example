@@ -1,0 +1,24 @@
+; Install as a dedicated pool after adapting account, socket, and paths.
+; Repository access must be READ ONLY and every configured root wholly public.
+[larasvn]
+user = larasvn
+group = larasvn
+listen = /run/php/larasvn.sock
+listen.owner = www-data
+listen.group = www-data
+listen.mode = 0660
+pm = ondemand
+pm.max_children = 4
+pm.process_idle_timeout = 10s
+pm.max_requests = 500
+request_terminate_timeout = 40s
+request_terminate_timeout_track_finished = yes
+clear_env = yes
+chdir = /srv/larasvn/current
+; APP_KEY and other Laravel settings belong in the protected production .env.
+; Build config:cache as this account in the production environment before serving.
+env[APP_ENV] = production
+php_admin_value[memory_limit] = 256M
+php_admin_value[sys_temp_dir] = /var/tmp/larasvn
+php_admin_flag[display_errors] = off
+php_admin_flag[log_errors] = on

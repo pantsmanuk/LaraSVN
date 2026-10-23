@@ -1,0 +1,8 @@
+{
+    "svn-hooks": {
+        "url": "file:///srv/svn/svn-hooks",
+        "group": "Tools",
+        "downloads": false,
+        "rss": true
+    }
+}

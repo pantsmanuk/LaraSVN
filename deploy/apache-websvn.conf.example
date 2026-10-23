@@ -1,0 +1,25 @@
+# Include inside the existing HTTPS VirtualHost. Adapt paths and preserve its
+# existing TLS configuration. This is a review template, not an installed config.
+Alias "/websvn" "/srv/larasvn/current/public"
+
+<Directory "/srv/larasvn/current/public">
+    Require all granted
+    AllowOverride None
+    Options -Indexes -MultiViews +FollowSymLinks
+    DirectoryIndex index.php
+
+    RewriteEngine On
+    RewriteBase /websvn/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [END]
+
+    <Files "index.php">
+        SetHandler "proxy:unix:/run/php/larasvn.sock|fcgi://localhost/"
+    </Files>
+
+    # Static filenames remain stable across builds; revalidate after deployment.
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=0, must-revalidate"
+    </FilesMatch>
+</Directory>

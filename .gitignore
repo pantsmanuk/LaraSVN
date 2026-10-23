@@ -1,0 +1,13 @@
+/vendor/
+/node_modules/
+/public/build/
+/.env
+/.env.*
+!/.env.example
+/.phpunit.cache/
+/.phpunit.result.cache
+/.agents/
+/.codex/
+/.aws/
+
+/repositories.json

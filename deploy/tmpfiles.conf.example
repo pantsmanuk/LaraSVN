@@ -1,0 +1,3 @@
+# Install as /etc/tmpfiles.d/larasvn.conf. Own this directory exclusively with
+# the application account. A 1-day cleanup age exceeds the 40-second hard deadline.
+d /var/tmp/larasvn 0700 larasvn larasvn 1d
