@@ -13,6 +13,31 @@ export function activateColors(container) {
     }
 }
 
+// Decorate rendered text, not grammars. Prism's recursive show-invisibles hook
+// cannot handle optional/null grammar entries used by languages such as Pascal.
+export function markWhitespace(container) {
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    for (const node of nodes) {
+        if (!/[ \t\r\n]/.test(node.textContent)) continue;
+        const fragment = document.createDocumentFragment();
+        for (const part of node.textContent.split(/([ \t\r\n])/)) {
+            if (!part) continue;
+            const type = { ' ': 'space', '\t': 'tab', '\r': 'cr', '\n': 'lf' }[part];
+            if (type) {
+                const span = document.createElement('span');
+                span.className = 'token ' + type;
+                span.textContent = part;
+                fragment.append(span);
+            } else {
+                fragment.append(document.createTextNode(part));
+            }
+        }
+        node.replaceWith(fragment);
+    }
+}
+
 export function enhanceRows(Prism, language, plugins) {
     const region = document.querySelector('.code-scroll');
     if (!region) return;

@@ -94,7 +94,7 @@ code { font:13px/24px "IBM Plex Mono","DejaVu Sans Mono",monospace; white-space:
 .prism-surface::before,.prism-surface::after { display:none; }
 .prism-no-line-numbers .gutter { width:0; padding:0; overflow:hidden; }
 .source-language { font-weight:600; }
-.token.lf { display:inline-block; width:1ch; }
+.token.lf:empty { display:inline-block; width:1ch; }
 span.inline-color-wrapper { background-image:repeating-conic-gradient(#b0b0b0 0% 25%,#fff 0% 50%); background-size:8px 8px; }
 @media (forced-colors:active) {
     .prism-surface,.prism-surface .token { color:CanvasText; background:Canvas; }

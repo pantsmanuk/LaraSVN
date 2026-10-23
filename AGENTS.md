@@ -5,6 +5,10 @@
 
 ## Known deployment surprises
 
+- Prism's native show-invisibles hook crashes on optional grammar entries, including
+  Pascal's. `prism-rows.js` marks rendered whitespace instead; keep grammar imports
+  driven by the `prism.config.json` registry and Prism's dependency resolver.
+
 - Leave routes uncached for subdirectory mounts with the current Laravel version.
   The compiled matcher trims `/websvn/` before resolving the base URL and returns
   405 with "Supported methods: HEAD" for the homepage. Use `route:clear`, retain

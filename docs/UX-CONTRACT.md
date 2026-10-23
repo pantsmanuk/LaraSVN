@@ -10,6 +10,7 @@ implementation ownership for local browsing, history, source, diff, and blame.
 | Revision selection | Shared `partials/context.blade.php` GET form | Explicit Go submits; invalid values produce a readable HTTP 400 page | Feature tests |
 | Appearance select | Native labelled select and `theme.js` | Platform popup is accepted; three explicit preferences share one owner | JS state checks; local browser checks passed |
 | Prism themes/plugins | `prism.config.json`, build integration, `token-lines.js`, and `prism-rows.js` | Local assets; paired palettes; row/clipboard text preserved; source normalization never trims content | Config validation and local browser plugin checks |
+| Syntax language | `prism.config.json` language registry, `languages.js`, and Prism's dependency resolver | Case-insensitive extension mapping drives bundled grammars and metadata labels; unknown types remain plain text in source/diff/blame | Generated-bundle tests, real-SVN Pascal views, and browser language checks |
 | Code rows | Blade source and comparison views | Server-readable text; source gutters excluded from selection; enhancement preserves line text | PHP and token tests; browser selection review pending |
 | Scrollbars | `resources/css/app.css` | Global semantic colours; document vertical flow; internal code horizontal overflow | Browser review pending |
 | Directory/search lists | Shared entries table and pagination | Semantic tables, directory-first ordering, 50 entries per page | Real-SVN feature tests |

@@ -137,13 +137,14 @@ try {
     const enabled = name => settings.plugins.includes(name);
     const css = '/* <img src=x onerror="window.sourceExecuted=true"> */\n.box {\n\tcolor: #ff0000;  \n\ttransform: rotate(45deg);\n\ttransition: color 1s ease;\n}\n';
     const escape = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    const codePage = (filename, documents, mode = 'source') => `<!doctype html><html data-appearance="light"><head><meta charset="utf-8"><link rel="stylesheet" href="${origin}/build/app.css"><script type="module" src="${origin}/build/code.js"></script></head><body>
+        <div class="code-toolbar"><button data-copy="new" hidden>Copy source</button><span id="copy-status"></span></div>
+        <div class="code-scroll prism-surface"><div class="${mode}" data-filename="${escape(filename).replaceAll('"', '&quot;')}">${Object.entries(documents).map(([side, text]) => text.replace(/\n$/, '').split('\n').map((line, i) => `<div class="source-row">${mode === 'blame' ? '<span class="attribution">r1 fixture</span>' : ''}<a class="gutter">${i + 1}</a><code data-document="${side}" data-line="${i + 1}">${escape(line)}</code></div>`).join('')).join('')}</div></div>
+        <p id="highlight-status"></p><script type="application/json" id="source-documents">${JSON.stringify(documents).replaceAll('<', '\\u003c')}</script></body></html>`;
     await context.route(origin + '/__prism-test', route => route.fulfill({
         contentType: 'text/html',
         headers: { 'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'" },
-        body: `<!doctype html><html data-appearance="light"><head><link rel="stylesheet" href="${origin}/build/app.css"><script type="module" src="${origin}/build/code.js"></script></head><body>
-            <div class="code-toolbar"><button data-copy="new" hidden>Copy source</button><span id="copy-status"></span></div>
-            <div class="code-scroll prism-surface"><div data-language="css">${css.slice(0, -1).split('\n').map((line, i) => `<div class="source-row"><a class="gutter">${i + 1}</a><code data-document="new" data-line="${i + 1}">${escape(line)}</code></div>`).join('')}</div></div>
-            <p id="highlight-status"></p><script type="application/json" id="source-documents">${JSON.stringify({ new: css }).replaceAll('<', '\\u003c')}</script></body></html>`,
+        body: codePage('sample.css', { new: css }),
     }));
     const cspErrors = [];
     page.on('console', message => {
@@ -186,6 +187,34 @@ try {
     if (settings.theme === 'prism.min.css') assert.equal(lightSurface, 'rgb(245, 242, 240)');
     if (settings.darkTheme === 'prism-tomorrow.min.css') assert.equal(darkSurface, 'rgb(45, 45, 45)');
     await page.screenshot({ path: '/tmp/larasvn-prism-plugins.png', fullPage: true });
+    const pascal = "program Demo;\nbegin\n  Writeln('café');\nend.\n";
+    const languageCases = [
+        ['Demo.PAS', pascal, 'Pascal'], ['Project.dpr', pascal, 'Pascal'],
+        ['Example.cs', 'public class Demo { public int Value = 42; }\n', 'C#'],
+        ['Example.tsx', 'const view = <Widget count={42} />;\n', 'React TSX'],
+        ['settings.json', '{"ok": true, "value": 42}\n', 'JSON'],
+        ['file.unknown', pascal, 'Plain text'],
+    ];
+    await context.route(origin + '/__prism-language-test*', route => {
+        const url = new URL(route.request().url());
+        const [filename, text] = languageCases[Number(url.searchParams.get('case'))];
+        const mode = url.searchParams.get('mode');
+        return route.fulfill({ contentType: 'text/html', body: codePage(filename, mode === 'diff' ? { old: text, new: text } : { new: text }, mode) });
+    });
+    for (const [index, [filename, text, title]] of languageCases.entries()) {
+        for (const mode of filename.endsWith('.PAS') ? ['source', 'diff', 'blame'] : ['source']) {
+            await page.goto(origin + '/__prism-language-test?case=' + index + '&mode=' + mode);
+            assert.equal(await page.locator('#highlight-status').textContent(), '', filename);
+            if (enabled('show-language')) assert.equal(await page.locator('.source-language').textContent(), title, filename);
+            assert.equal(await page.locator('code[data-document="new"]').evaluateAll(rows => rows.map(row => row.textContent).join('\n') + '\n'), text, filename);
+            const syntax = await page.locator('code .token.keyword, code .token.tag, code .token.property').count();
+            assert.equal(syntax > 0, title !== 'Plain text', filename);
+            if (mode === 'diff') assert(await page.locator('code[data-document="old"] .token.keyword').count() > 0);
+        }
+    }
+    assert.deepEqual(errors, []);
+    assert.deepEqual(cspErrors, []);
+    console.log('Language checks passed: Pascal/Delphi source, diff and blame; C#, TSX, JSON, uppercase extensions, exact text, and plain-text fallback.');
     console.log('Prism configuration checks passed: exact source text, escaped markup, CSP, theme surfaces, and enabled plugin behavior. Plugins: ' + (settings.plugins.join(', ') || 'none'));
     console.log('Browser checks passed: source, multiline diff, blame, themes, persistence, system changes, cross-tab updates, mobile width, missing revision, no-JS reading, directory navigation, history pagination, filename search, deletion links, arbitrary comparison, reversal, aliases, downloads, RSS, skip-link focus, landmarks, and control labels.');
 } finally {

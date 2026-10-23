@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Svn\Fixture;
 use Illuminate\Support\Facades\File;
+use Symfony\Component\Process\Process;
 use Tests\TestCase;
 
 final class CodeViewsTest extends TestCase
@@ -86,5 +87,31 @@ final class CodeViewsTest extends TestCase
         $this->get('/filedetails.php?repname=unknown')->assertNotFound();
         $this->get('/filedetails.php?path=/missing.php')->assertNotFound();
         $this->get('/filedetails.php?rev=9999')->assertNotFound();
+    }
+
+    public function test_pascal_filenames_reach_the_shared_highlighter_in_source_diff_and_blame(): void
+    {
+        $directory = self::$fixture.'/pascal-test';
+        mkdir($directory);
+        $run = static fn (array $arguments) => (new Process($arguments, $directory))->setTimeout(20)->mustRun();
+        $run(['svnadmin', 'create', 'repository']);
+        $run(['svn', 'checkout', 'file://'.$directory.'/repository', 'working']);
+        foreach (['Hello', 'Bonjour'] as $index => $message) {
+            foreach (['Demo.PAS', 'Project.dpr'] as $filename) {
+                file_put_contents($directory.'/working/'.$filename, "program Demo;\nbegin\n  Writeln('".$message."');\nend.\n");
+            }
+            if ($index === 0) {
+                $run(['svn', 'add', 'working/Demo.PAS', 'working/Project.dpr']);
+            }
+            $run(['svn', 'commit', '--username', 'fixture', '-m', $message, 'working']);
+        }
+        config(['svn.repositories' => ['fixture' => ['url' => 'file://'.$directory.'/repository']]]);
+        foreach (['Demo.PAS', 'Project.dpr'] as $filename) {
+            foreach (['filedetails.php', 'diff.php', 'blame.php'] as $endpoint) {
+                $this->get('/'.$endpoint.'?'.http_build_query(['repname' => 'fixture', 'path' => '/'.$filename]))
+                    ->assertOk()->assertSee('data-filename="'.$filename.'"', false)
+                    ->assertViewHas('document', fn ($document) => str_contains($document->text, 'Bonjour'));
+            }
+        }
     }
 }

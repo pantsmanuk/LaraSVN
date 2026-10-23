@@ -110,11 +110,14 @@ the command, coverage, and remaining manual and deployment checks.
 
 ## Prism configuration
 
-Edit [prism.config.json](prism.config.json) to select the light/dark code themes
-and enabled plugins, then run `npm run build`. Defaults use Prism's standard
+Edit [prism.config.json](prism.config.json) to select the light/dark code themes,
+file-extension mappings, and enabled plugins, then run `npm run build`. Defaults
+use Prism's standard
 theme in light mode, Tomorrow in dark mode, and all nine MantisMarkdown options.
 Use the same theme for both settings if you prefer a fixed code palette.
-See [Prism configuration](docs/PRISM.md) for supported choices and source-preservation rules.
+Pascal/Delphi and common source formats are mapped to their Prism grammars, which
+are bundled automatically with their dependencies. Unknown extensions use plain
+text. See [Prism configuration](docs/PRISM.md) for supported choices and source-preservation rules.
 
 ## Scope and next work
 

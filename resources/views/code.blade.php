@@ -25,7 +25,7 @@
         <p class="notice">No text differences with these comparison settings.</p>
     @else
         <div class="code-scroll prism-surface" tabindex="0" role="region" aria-label="Source comparison">
-            <div class="diff-table" data-language="{{ $language }}">
+            <div class="diff-table" data-filename="{{ basename($path) }}">
                 <div class="diff-heading"><span>Previous · r{{ $previous }}</span><span>Current · r{{ $revision }}</span></div>
                 @foreach($rows as $row)
                     @if($row['kind'] === 'hunk')
@@ -49,7 +49,7 @@
 @else
     <div class="code-toolbar"><span>{{ count($document->lines) }} lines</span><button type="button" data-copy="new" hidden>Copy source</button><span id="copy-status" role="status"></span></div>
     <div class="code-scroll prism-surface" tabindex="0" role="region" aria-label="{{ $mode === 'blame' ? 'Source with line attribution' : 'Source code' }}">
-        <div class="source-table {{ $mode }}" data-language="{{ $language }}">
+        <div class="source-table {{ $mode }}" data-filename="{{ basename($path) }}">
             @forelse($document->lines as $index => $line)
                 <div class="source-row">
                     @if($mode === 'blame')

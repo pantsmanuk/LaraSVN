@@ -75,11 +75,8 @@ final class CodeController extends Controller
             $attribution = $svn->blame($repository, $path, $revision, $peg);
             abort_unless(count($attribution) === count($document->lines), 502, 'Source and attribution do not agree.');
         }
-        $language = match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
-            'php' => 'php', 'js', 'json' => 'javascript', 'html', 'xml', 'svg' => 'markup', 'css' => 'css', default => 'plain',
-        };
         $params = ['repname' => $repository, 'path' => $path, 'rev' => $revision, 'peg' => $peg];
 
-        return view('code', compact('mode', 'repository', 'path', 'revision', 'peg', 'document', 'old', 'previous', 'rows', 'attribution', 'history', 'all', 'ignoreWhitespace', 'language', 'params', 'properties', 'navigationPath'));
+        return view('code', compact('mode', 'repository', 'path', 'revision', 'peg', 'document', 'old', 'previous', 'rows', 'attribution', 'history', 'all', 'ignoreWhitespace', 'params', 'properties', 'navigationPath'));
     }
 }

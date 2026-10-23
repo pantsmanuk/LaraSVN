@@ -1,6 +1,7 @@
-import Prism, { settings } from 'larasvn:prism';
+import Prism, { settings, languageTitles } from 'larasvn:prism';
+import { languageForFilename } from './languages.js';
 import { tokenLines } from './token-lines.js';
-import { renderPart, enhanceRows, activateColors } from './prism-rows.js';
+import { renderPart, enhanceRows, activateColors, markWhitespace } from './prism-rows.js';
 
 const enabled = name => settings.plugins.includes(name);
 // Rewrite Prism's generated swatches before HTML parsing; apply their validated
@@ -20,7 +21,7 @@ function showLanguage(language, toolbar) {
     if (!enabled('show-language') || !toolbar) return;
     const label = document.createElement('span');
     label.className = 'source-language';
-    label.textContent = ({ php: 'PHP', javascript: 'JavaScript', css: 'CSS', markup: 'HTML/XML', plain: 'Plain text', diff: 'Diff' })[language] ?? language;
+    label.textContent = languageTitles[language];
     toolbar.prepend(label);
 }
 
@@ -39,7 +40,8 @@ function enableCopy(button, text, status) {
 const payload = document.querySelector('#source-documents');
 if (payload) {
     const documents = JSON.parse(payload.textContent);
-    const language = document.querySelector('[data-language]')?.dataset.language ?? 'plain';
+    const filename = document.querySelector('[data-filename]')?.dataset.filename ?? '';
+    const language = languageForFilename(filename, settings.languages);
     try {
         const tokens = Object.fromEntries(Object.entries(documents).map(([name, text]) => [name, tokenLines(Prism, text, language)]));
         for (const code of document.querySelectorAll('code[data-document]')) {
@@ -56,6 +58,7 @@ if (payload) {
                 fragment.append(ending);
             }
             code.replaceChildren(fragment);
+            if (enabled('show-invisibles')) markWhitespace(code);
         }
         enhanceRows(Prism, language, settings.plugins);
         showLanguage(language, document.querySelector('.code-toolbar'));
@@ -92,6 +95,7 @@ if (patch) {
         patch.parentElement.classList.toggle('match-braces', enabled('match-braces'));
         patch.classList.toggle('diff-highlight', enabled('diff-highlight'));
         Prism.highlightElement(patch);
+        if (enabled('show-invisibles')) markWhitespace(patch);
         activateColors(patch);
     } catch {
         document.querySelector('#highlight-status').textContent = 'Syntax highlighting is unavailable. Patch remains readable.';

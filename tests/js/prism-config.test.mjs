@@ -8,5 +8,8 @@ test('Prism settings accept an empty plugin list and reject unsupported assets',
     for (const change of [
         { theme: '../app.css' }, { darkTheme: 'https://example.test/theme.css' },
         { plugins: ['unknown'] }, { plugins: 'all' }, { extra: true },
+        { languages: [] }, { languages: { unknown: ['pas'] } },
+        { languages: { pascal: ['../pas'] } }, { languages: { pascal: ['PAS'] } },
+        { languages: { pascal: ['pas'], php: ['pas'] } },
     ]) assert.throws(() => validatePrismConfig({ ...settings, ...change }), /Prism/);
 });
